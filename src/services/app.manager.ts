@@ -1,11 +1,19 @@
 import { TextNode, TextType } from '@uprtcl/documents';
-import { AppElement, AppElements, Evees } from '@uprtcl/evees';
+import {
+  AppElement,
+  AppElements,
+  Evees,
+  Perspective,
+  Secured,
+} from '@uprtcl/evees';
 import { EveesHttp, PermissionType } from '@uprtcl/evees-http';
-import lodash from 'lodash';
-import { Dashboard, PageShareMeta } from 'src/containers/types';
+import { Dashboard } from 'src/containers/types';
+
+export const BLOG_POST_CATEGORY = 'blogpost';
 
 export class AppManager {
   elements: AppElements;
+  readonly categories: Map<string, Secured<Perspective>> = new Map();
 
   constructor(protected evees: Evees, appElementsInit: AppElement) {
     this.elements = new AppElements(evees, appElementsInit);
@@ -27,6 +35,19 @@ export class AppManager {
       PermissionType.Read,
       true
     );
+  }
+
+  async checkCategories() {
+    const remote = this.evees.getRemote() as EveesHttp;
+    const aBlogPost = await remote.snapPerspective({
+      context: BLOG_POST_CATEGORY,
+      creatorId: '',
+      remote: '',
+      timestamp: 0,
+      path: '',
+    });
+
+    this.categories.set(BLOG_POST_CATEGORY, aBlogPost);
   }
 
   async newPage(onSectionId: string) {
