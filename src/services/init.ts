@@ -61,7 +61,7 @@ export const initUprtcl = async () => {
   );
 
   const httpStore = new HttpStore(httpConnection, httpCidConfig);
-  const httpEvees = new EveesHttp(httpConnection, httpStore);
+  const httpEvees = new EveesHttp(httpConnection, httpStore.id);
 
   const remotes = [httpEvees];
   const modules = new Map<string, EveesContentModule>();
