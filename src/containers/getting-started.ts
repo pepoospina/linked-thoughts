@@ -1,4 +1,10 @@
-import { html, css, internalProperty, LitElement, property } from 'lit-element';
+import {
+  html,
+  css,
+  internalProperty,
+  property,
+  TemplateResult,
+} from 'lit-element';
 
 import { styles } from '@uprtcl/common-ui';
 import { Logger } from '@uprtcl/evees';
@@ -10,7 +16,6 @@ import { Home } from '../constants/routeNames';
 import { ConnectedElement } from '../services/connected.element';
 import { AUTH0_CONNECTION, ETH_ACCOUNT_CONNECTION } from '../services/init';
 import { HttpMultiConnection } from '@uprtcl/http-provider';
-import TreesBackground from '../assets/trees.png';
 import IntercreativityLogo from '../assets/intercreativity.svg';
 import GoogleIcon from '../assets/icons/google.svg';
 import FBIcon from '../assets/icons/facebook.svg';
@@ -33,7 +38,7 @@ export class GettingStartedElement extends ConnectedElement {
   @internalProperty()
   hasWeb3 = false;
 
-  @property()
+  @internalProperty()
   carouselSelectedIndex: number = 0;
 
   carouselSelectedIndexIntervel;
@@ -73,6 +78,21 @@ export class GettingStartedElement extends ConnectedElement {
     Router.go(Home);
   }
 
+  renderItem(
+    sNumber: string,
+    background: TemplateResult,
+    title: string,
+    description: string
+  ) {
+    return html`<div class="carousel-item" slot=${sNumber}>
+      <div class="bkg-illustration right top">${background}</div>
+      <div class="content">
+        <h2>${title}</h2>
+        <h3 class="description">${description}</h3>
+      </div>
+    </div>`;
+  }
+
   render() {
     if (this.loading) return html` <uprtcl-loading></uprtcl-loading> `;
 
@@ -82,7 +102,7 @@ export class GettingStartedElement extends ConnectedElement {
           ${IntercreativityLogo}
 
           <div class="login-card">
-            <h1>Log In</h1>
+            <div class="heading">Log In</div>
             <div
               class="login-button"
               @click=${() => this.login(AUTH0_CONNECTION)}
@@ -106,65 +126,36 @@ export class GettingStartedElement extends ConnectedElement {
         </div>
 
         <div>
-          <ui5-carousel
+          <uprtcl-carousel
+            n-slots="4"
             class="carousel-cont"
-            cyclic="true"
             selected-index=${this.carouselSelectedIndex}
           >
-            <div class="carousel-item">
-              <div class="bkg-illustration right top">${Home1Background}</div>
-              <div class="content">
-                <h2>Smash the Walls</h2>
-                <h3 class="description">
-                  Create and share your ideas the way you want, on an open
-                  ecosystem of linked and cross-referenced content made of
-                  different platforms, rules, and content types.
-                </h3>
-              </div>
-            </div>
-            <div class="carousel-item">
-              <div class="bkg-illustration right top">${Home21Background}</div>
-              <div class="bkg-illustration left bottom">
-                ${Home22Background}
-              </div>
-              <div class="content">
-                <h2>Connect with Others</h2>
-                <h3 class="description">
-                  Build your personal "graph" of ideas. Flexibly decide which
-                  portion you want to share, discover other's work, and connect
-                  it with yours.
-                </h3>
-              </div>
-            </div>
-            <div class="carousel-item">
-              <div class="bkg-illustration right bottom">
-                ${Home3Background}
-              </div>
-
-              <div class="content">
-                <h2>Explore A Decentralized World</h2>
-                <h3 class="description">
-                  Use familiar web-hosting services or leverage emerging
-                  decentralized technologies to govern and free your ideas and
-                  those of your community.
-                </h3>
-              </div>
-            </div>
-            <div class="carousel-item">
-              <div class="bkg-illustration right top">${Home4Background}</div>
-
-              <div class="content">
-                <h2>Open your Mind</h2>
-                <h3 class="description">
-                  Connect your content with that of others. Track its origin.
-                  Remix it. Branch and evolve it. Make proposals.
-                  <br />
-                  Embrace the information chaos we now live in, and learn, with
-                  us, how to make sense of it. risus.
-                </h3>
-              </div>
-            </div>
-          </ui5-carousel>
+            ${this.renderItem(
+              '0',
+              Home1Background,
+              'Smash the Walls',
+              'Create and share your ideas the way you want, on an open ecosystem of linked and cross-referenced content made of different platforms, rules, and content types.'
+            )}
+            ${this.renderItem(
+              '1',
+              Home21Background,
+              'Connect with Others',
+              'Build your personal "graph" of ideas. Flexibly decide which portion you want to share, discover other\'s work, and connect it with yours.'
+            )}
+            ${this.renderItem(
+              '2',
+              Home3Background,
+              'Smash the Walls',
+              'Use familiar web-hosting services or leverage emerging decentralized technologies to govern and free your ideas and those of your community.'
+            )}
+            ${this.renderItem(
+              '3',
+              Home4Background,
+              'Smash the Walls',
+              'Connect your content with that of others. Track its origin. Remix it. Branch and evolve it. Make proposals. Embrace the information chaos we now live in, and learn, with us, how to make sense of it.'
+            )}
+          </uprtcl-carousel>
         </div>
       </div>
     `;
@@ -208,6 +199,10 @@ export class GettingStartedElement extends ConnectedElement {
           margin-bottom: 0.7rem;
         }
 
+        .login-button:hover {
+          background-color: #efeffd;
+        }
+
         .login-button > svg {
           height: 1.1rem;
           width: 1.1rem;
@@ -235,15 +230,24 @@ export class GettingStartedElement extends ConnectedElement {
           flex-direction: column;
           position: relative;
         }
+        .carousel-item {
+          position: relative;
+          height: 100%;
+          width: 100%;
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+          align-items: center;
+        }
         .bkg-illustration {
           position: absolute;
           z-index: 1;
         }
         .top {
-          top: 10%;
+          top: 0;
         }
         .right {
-          right: 0;
+          right: 20px;
         }
         .left {
           left: 0;
@@ -265,31 +269,34 @@ export class GettingStartedElement extends ConnectedElement {
           flex-direction: column;
           justify-content: center;
           align-items: center;
+          max-width: 550px;
+          max-height: 500px;
+        }
+        .login-card .heading {
+          font-weight: bold;
+          font-size: 40px;
+          line-height: 140%;
+          color: #262641;
+          margin-bottom: 2rem;
         }
         .content {
           text-align: center;
           width: 70%;
           font-weight: 700;
           width: 100%;
+          max-width: 600px;
         }
         .description {
           color: #5c5c77;
           font-weight: 500;
+          font-size: 20px;
+          line-height: 176%;
         }
         .login-cont {
           background-image: url('src/assets/trees.png');
           background-repeat: no-repeat;
           background-size: cover;
           width: 100%;
-        }
-        .carousel-item {
-          position: relative;
-          height: 100%;
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          padding: 0 20%;
-          background: var(--white, #fff);
         }
         uprtcl-button {
           width: 300px;
